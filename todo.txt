@@ -1,0 +1,33 @@
+#figure out why nxml table gets fucked by lua-python interfacing
+#add three layers: visual, hotspots and stains
+
+#xml-encoded hotspot painter (the filename is extracted from the xml)
+#hotspot palette is being automatically assembled from xml with annotations displayed near every painted pixel
+
+#numerate every individual color and display a palette
+#allow autonumeration on holding ctrl where every next painted pixel is the next shade (ctrl+shift is the opposite)
+#automatically name the file properly
+#iterate by animations an dframes, free movement forwards and backwards
+#show previous or default image to the left
+#allow generating new colors by picking two pixels and getting average
+
+-----------------------------------------------------------------------------------------------------------------------
+
+I have this script and I want to improve it. Can you add animation and frame selectors, which ensure only a single frame of a single animation is displayed at once. Add button to freely switch between animations and frames, and also make sure it is possible to playback the sequence.
+
+To implement this feature, you'll need to familiarize yourself with the contents of anim_data variable, which you'll use to determine the x,y of the top left corner and width,height of the first frame of each animation. To get the number of frames in each animation, pay attention to "frame_count". The next frame can be obtained by simply shifting the x coordinate of the first frame a whole width to the right. Every single animation has the same frame size, as defined in default animation, and the y offset between each animation row is fixed as the difference between positions of the default animation and the one immediately following it.
+
+Additionally, here's the explanation of the anim_data structure:
+	- anim_data.attr.filename
+	- anim_data.attr.hotspots_filename
+	- anim_data.attr.default_animation
+	- anim_data.children (that's a table where all the animation definitions are stored)
+	- anim_data.children[i].name (this is the name of the element, you are only interested in RectAnimation)
+	- anim_data.children[i].attr.name (this is the name of the animation, if this matches anim_data.attr.default_animation then this is the default animation)
+	- anim_data.children[i].attr.pos_x (this is the x position of top left corner of the first frame of this animation)
+	- anim_data.children[i].attr.pos_y (this is the y position of top left corner of the first frame of this animation)
+	- anim_data.children[i].attr.frame_width (this is the x dimension of all frames of this animation)
+	- anim_data.children[i].attr.frame_height (this is the y dimension of all frames of this animation)
+	- anim_data.children[i].attr.frame_count (this is the total length of this animation)
+
+Keep in mind that only animations past the default one should be displayed and don't bother with animations that have "parent" field defined. Automatically save the modifications to the file on the frame or animation switch, and make sure the whole sprite sheet is saved accurately, even though only single frame is displayed at once.

@@ -1,0 +1,2 @@
+python SpritesheetPipeline.py
+pause
